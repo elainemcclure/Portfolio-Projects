@@ -141,16 +141,24 @@ FROM percent_population_vaccinated;
 
 -- Creating view to store data for later visualizations 
 
-CREATE VIEW percent_population_vaccinated AS
-SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations,
-SUM(CAST(vac.new_vaccinations AS INT)) OVER (Partition by dea.location ORDER BY dea.location, 
-dea.date) AS rolling_people_vaccinated
-FROM `covidproject-421501.covid_deaths.covid_deaths` dea
-JOIN `covidproject-421501.covid_vaccinations.covid_vaccinations` vac
-  ON dea.location = vac.location
+CREATE VIEW covid_deaths.percent_population_vaccinated_view AS
+SELECT 
+  dea.continent, 
+  dea.location, 
+  dea.date, 
+  dea.population, 
+  vac.new_vaccinations,
+  SUM(CAST(vac.new_vaccinations AS INT)) OVER (PARTITION BY dea.location ORDER BY dea.location, dea.date) AS rolling_people_vaccinated
+FROM 
+  `covidproject-421501.covid_deaths.covid_deaths` dea
+JOIN 
+  `covidproject-421501.covid_vaccinations.covid_vaccinations` vac
+ON 
+  dea.location = vac.location
   AND dea.date = vac.date
-WHERE dea.continent IS NOT NULL
-AND vac.new_vaccinations IS NOT NULL;
+WHERE 
+  dea.continent IS NOT NULL
+  AND vac.new_vaccinations IS NOT NULL;
 
 
 
